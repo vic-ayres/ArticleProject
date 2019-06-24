@@ -42,7 +42,7 @@ def load_data():
             # Add the label to the articles_labels list
             articles_labels.append(row.label)
             
-    return articles, articles_labels
+    return articles, np.array(articles_labels)
 
 
 # Removes the first nine lines of an article

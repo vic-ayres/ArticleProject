@@ -6,8 +6,9 @@ from gensim.models import KeyedVectors
 from confusion_matrix import ConfusionMatrix
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, accuracy_score
+import sys
 
 
 # Load in the data from annotated atricles
@@ -21,7 +22,7 @@ print()
 docs = []
 for a in articles:
     doc = st.tokenize(a)
-    docs.append(a)
+    docs.append(doc)
 
 
 # Each tokenized document is associated with the
@@ -29,23 +30,27 @@ for a in articles:
 word_embedding_list = []
 word_vectors = KeyedVectors.load('vectors.kv', mmap='r')
 for d in docs:
-    vector = emb.word_embedding(word_vectors, doc)
+    vector = emb.word_embedding(word_vectors, d)
     word_embedding_list.append(vector)
-    break
+
     
-print(word_embedding_list)
+print(type(word_embedding_list))
 print(len(word_embedding_list))
 print()
 
 
+
+
 # Splits the annotated data into training, developing, and testing data
 # Stratifies them based on the labels
-x, x_test, y, y_test = train_test_split(word_embedding_list, labels,
+x, x_test, y, y_test = train_test_split(np.array(word_embedding_list), labels,
                                                     test_size=0.1,
                                                     stratify = labels)
 x_train, x_dev, y_train, y_dev = train_test_split(x,y,
                                                   test_size=0.1,
                                                   stratify = y)
+
+
 print("Data split to train, develop, and test...")
 print()
 
@@ -57,7 +62,8 @@ print('Oversamples data using SMOTE...')'''
 
 
 # Create and train Mutlinomial Naive Bayes classifier
-clf = MultinomialNB()
+clf = LogisticRegression(solver='lbfgs',
+                            multi_class='multinomial')
 clf.fit(x_train, y_train)
 print("Classifier trained...")
 print()
